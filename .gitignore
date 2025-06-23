@@ -1,1 +1,3 @@
 data/qdrant_storage
+.devcontainer
+__pycache__
