@@ -1,254 +1,357 @@
-# RAG Sample Project
+# LocalRAG - Privacy-First RAG Application
 
-A Retrieval-Augmented Generation (RAG) system that combines semantic search with Large Language Models to provide contextual responses about startup companies. This project demonstrates how to build a neural search engine using vector embeddings and integrate it with a local LLM for intelligent question-answering.
+A desktop Retrieval-Augmented Generation (RAG) application that combines semantic search with local Large Language Models. Built for privacy-conscious users who want AI-powered search without data leaving their machine.
 
-## Project Overview
+## 🎯 Project Status
 
-This RAG system allows users to search through a database of startup companies and get AI-powered responses that provide relevant information based on the search context. The system uses:
+**Current State:**
+- ✅ Core RAG pipeline working
+- ✅ Vector search with Qdrant
+- ✅ Ollama integration for local LLM
+- ✅ FastAPI backend
+- ✅ Basic Streamlit frontend
+- 📝 README and documentation (you're reading it!)
+- 🔄 CI/CD pipeline configured
 
-- **Vector Database**: Qdrant for storing and searching startup embeddings
-- **Embedding Model**: SentenceTransformers (all-MiniLM-L6-v2) for text vectorization
-- **LLM Integration**: Ollama with Llama2 for response generation
-- **API Backend**: FastAPI for serving the neural search API
-- **Frontend**: Streamlit for the user interface
+**What's Working:**
+- Semantic search over documents using sentence embeddings
+- Context-aware responses from local Llama2
+- RESTful API endpoints
+- Docker support for Qdrant
 
-## Architecture
+**What's Next:**
+- Desktop UI (Electron/Tauri vs Streamlit)
+- Plugin system for extensibility
+- Obsidian connector (planned first plugin)
 
-```
-┌─────────────────┐    ┌─────────────────┐    ┌─────────────────┐
-│   Frontend      │    │   Backend API   │    │   Vector DB     │
-│  (Streamlit)    │◄──►│   (FastAPI)     │◄──►│   (Qdrant)      │
-└─────────────────┘    └─────────────────┘    └─────────────────┘
-                                │
-                                ▼
-                       ┌─────────────────┐
-                       │   Local LLM     │
-                       │   (Ollama)      │
-                       └─────────────────┘
-```
+## 💼 Business Model
 
-## Project Structure
+**Open-Core Model:**
+- **Free Core**: Basic RAG functionality for everyone
+- **Paid Plugins** ($10-25 each): Specialized connectors and features
+- **First Plugin**: Obsidian Connector ($15 planned)
 
-```
-rag_sample/
-├── neural_search/           # Core neural search functionality
-│   ├── app.py              # FastAPI application
-│   ├── search_api.py       # Neural search implementation
-│   └── llm_interaction.py  # LLM integration
-├── frontend/               # Streamlit frontend
-│   └── index.py           # Simple frontend demo
-├── data/                  # Data storage
-│   ├── startups_demo.json # Sample startup data
-│   ├── startup_vectors.npy # Pre-computed vectors
-│   └── qdrant_storage/    # Qdrant database files
-├── notebooks/             # Jupyter notebooks for setup
-│   ├── rag_setup.ipynb    # RAG system setup
-│   ├── neural_search.ipynb # Neural search demo
-│   └── load_vectordata.ipynb # Data loading utilities
-├── .devcontainer/         # Development container config
-└── requirements.txt       # Python dependencies
-```
+## 🚀 Quick Start
 
-## Features
+### Prerequisites
 
-- **Semantic Search**: Find startups based on semantic similarity rather than keyword matching
-- **Contextual AI Responses**: Get intelligent answers powered by LLM with relevant startup context
-- **RESTful API**: Clean API endpoints for integration with other applications
-- **Vector Storage**: Efficient vector storage and retrieval using Qdrant
-- **Scalable Architecture**: Modular design supporting easy extension and modification
+1. **Python 3.11+**
+2. **Qdrant** (vector database)
+3. **Ollama** (local LLM serving)
 
-## Prerequisites
-
-Before running this project, ensure you have the following installed:
-
-### Required Services
-
-1. **Qdrant Vector Database**
-   ```bash
-   docker run -p 6333:6333 qdrant/qdrant
-   ```
-
-2. **Ollama with Llama2**
-   ```bash
-   # Install Ollama
-   curl -fsSL https://ollama.ai/install.sh | sh
-   
-   # Pull Llama2 model
-   ollama pull llama2
-   
-   # Run Ollama server
-   ollama serve
-   ```
-
-### Python Environment
-
-- Python 3.11+
-- Dependencies listed in `requirements.txt`
-
-## Installation
-
-1. **Clone the repository**
-   ```bash
-   git clone <repository-url>
-   cd rag_sample
-   ```
-
-2. **Install Python dependencies**
-   ```bash
-   pip install -r requirements.txt
-   ```
-
-3. **Set up the vector database** (if not already done)
-   
-   Use the provided Jupyter notebooks to load data into Qdrant:
-   ```bash
-   jupyter notebook notebooks/rag_setup.ipynb
-   ```
-
-4. **Verify services are running**
-   - Qdrant: http://localhost:6333
-   - Ollama: http://localhost:11434
-
-## Running the Application
-
-### 1. Start the Backend API
+### Installation
 
 ```bash
+# Clone the repository
+git clone <repository-url>
+cd rag_with_ollama
+
+# Create virtual environment
+python -m venv venv
+source venv/bin/activate  # Linux/Mac
+# or
+.\venv\Scripts\activate  # Windows
+
+# Install dependencies
+pip install -r requirements.txt
+
+# Start Qdrant (vector database)
+docker run -p 6333:6333 qdrant/qdrant
+
+# Start Ollama
+ollama serve
+ollama pull llama2
+```
+
+### Running the Application
+
+```bash
+# Terminal 1: Start the API
 cd neural_search
 python app.py
-```
 
-The API will be available at `http://localhost:8000`
-
-### 2. API Endpoints
-
-- **Search Endpoint**: `GET /api/search?q=<your_query>`
-  
-  Example:
-  ```bash
-  curl "http://localhost:8000/api/search?q=healthcare startups"
-  ```
-
-  Response:
-  ```json
-  {
-    "result": "Based on the healthcare startups in the context...",
-    "context": [
-      {
-        "name": "CancerIQ",
-        "description": "Predictive analytics to eliminate cancer...",
-        "city": "Chicago"
-      }
-    ]
-  }
-  ```
-
-### 3. Frontend Interface (Optional)
-
-```bash
+# Terminal 2: Start the frontend (optional)
 cd frontend
 streamlit run index.py
+
+# API available at: http://localhost:8000
+# Frontend available at: http://localhost:8501
+# API Docs: http://localhost:8000/docs
 ```
 
-Note: The current frontend is a basic demo. You can extend it to create a full search interface.
+### Testing the API
 
-## Configuration
+```bash
+# Search for startups
+curl "http://localhost:8000/api/search?q=healthcare startups"
+
+# Response format:
+{
+  "result": "AI-generated response...",
+  "context": [
+    {"name": "StartupName", "description": "...", "city": "..."}
+  ]
+}
+```
+
+## 📁 Project Structure
+
+```
+rag_with_ollama/
+├── neural_search/          # Core backend logic
+│   ├── app.py            # FastAPI application
+│   ├── search_api.py     # Vector search implementation
+│   └── llm_interaction.py # LLM integration
+├── frontend/              # User interface
+│   └── index.py         # Streamlit demo
+├── data/                  # Data storage
+│   ├── startups_demo.json
+│   └── qdrant_storage/
+├── notebooks/             # Jupyter notebooks
+│   ├── rag_setup.ipynb
+│   └── neural_search.ipynb
+├── .github/              # CI/CD configuration
+├── requirements.txt      # Python dependencies
+└── README.md             # This file
+```
+
+## 🏗️ Architecture
+
+```
+┌─────────────────────────────────────────────────────────────┐
+│                    User Interface                         │
+│           (Streamlit / Future Desktop App)             │
+└─────────────────────┬───────────────────────────────────┘
+                      │
+                      ▼
+┌─────────────────────────────────────────────────────────────┐
+│                    FastAPI Backend                       │
+│                    (Python/FastAPI)                      │
+└─────────────────────┬───────────────────────────────────┘
+                      │
+          ┌───────────┴───────────┐
+          ▼                       ▼
+┌─────────────────┐     ┌─────────────────┐
+│    Qdrant       │     │     Ollama      │
+│  (Vector DB)    │     │   (Local LLM)   │
+└─────────────────┘     └─────────────────┘
+```
+
+## 🔧 Configuration
 
 ### Environment Variables
 
-The application uses the following service endpoints (configurable in the code):
+```bash
+# Qdrant connection
+QDRANT_URL=http://localhost:6333
 
-- **Qdrant**: `http://host.docker.internal:6333` (for Docker) or `http://localhost:6333`
-- **Ollama**: `http://host.docker.internal:11434` (for Docker) or `http://localhost:11434`
+# Ollama connection
+OLLAMA_URL=http://localhost:11434
 
-### Model Configuration
+# Model settings
+EMBEDDING_MODEL=all-MiniLM-L6-v2
+LLM_MODEL=llama2
+```
 
-- **Embedding Model**: `all-MiniLM-L6-v2` (SentenceTransformers)
-- **LLM Model**: `llama2` (via Ollama)
-- **Collection Name**: `startups`
+### Changing Models
 
-## Development
+**Embedding Model** (in `neural_search/search_api.py`):
+```python
+from sentence_transformers import SentenceTransformer
+model = SentenceTransformer('all-MiniLM-L6-v2')  # Change this line
+```
 
-### Using Dev Containers
+**LLM Model** (in `neural_search/llm_interaction.py`):
+```python
+ollama pull llama2  # Or another model
+model = "llama2"  # Change this variable
+```
 
-This project includes a VS Code dev container configuration for easy development:
+## 📦 Dependencies
 
-1. Open the project in VS Code
-2. Install the "Dev Containers" extension
-3. Click "Reopen in Container" when prompted
+Key packages:
+- `fastapi` - Web framework
+- `qdrant-client` - Vector database client
+- `sentence-transformers` - Text embeddings
+- `ollama` - Local LLM integration
+- `streamlit` - Frontend framework
+- `uvicorn` - ASGI server
 
-### Data Management
+Full list: `requirements.txt`
 
-The project includes sample startup data in JSON format. To add more data:
+## 🐳 Docker Setup
 
-1. Update `data/startups_demo.json` with new entries
-2. Run the data loading notebook to update the vector database
+### Development Container
+
+1. Open in VS Code
+2. Install "Dev Containers" extension
+3. Click "Reopen in Container"
+
+### Manual Docker Run
+
+```bash
+# Start Qdrant
+docker run -p 6333:6333 qdrant/qdrant
+
+# Check logs
+docker logs <container-id>
+```
+
+## 🧪 Testing
+
+```bash
+# Run pytest (if tests exist)
+pytest
+
+# Manual API testing
+curl -X GET "http://localhost:8000/api/search?q=test"
+```
+
+## 📝 Data Management
+
+### Adding Documents
+
+1. Place documents in `data/` directory
+2. Run the setup notebook: `notebooks/rag_setup.ipynb`
 3. Restart the API server
 
-### Extending the System
+### Sample Data
 
-- **Add new data sources**: Modify the data loading notebooks
-- **Change embedding models**: Update `search_api.py`
-- **Integrate different LLMs**: Modify `llm_interaction.py`
-- **Enhance the frontend**: Extend `frontend/index.py`
+The `data/startups_demo.json` contains sample startup data for testing. Replace with your own documents for production use.
 
-## Troubleshooting
+## 🔍 API Reference
+
+### Endpoints
+
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| GET | `/api/search?q=<query>` | Search and get AI response |
+| GET | `/health` | Health check |
+| GET | `/docs` | Interactive API documentation |
+
+### Search Response
+
+```json
+{
+  "result": "AI-generated contextual answer",
+  "context": [
+    {
+      "name": "Company Name",
+      "description": "Company description...",
+      "city": "Location"
+    }
+  ],
+  "processing_time": "0.5s"
+}
+```
+
+## 🚨 Troubleshooting
 
 ### Common Issues
 
-1. **Qdrant Connection Error**
-   ```
-   Ensure Qdrant is running on port 6333
-   docker ps | grep qdrant
-   ```
+**Qdrant Connection Failed:**
+```bash
+# Check if Qdrant is running
+docker ps | grep qdrant
 
-2. **Ollama Connection Error**
-   ```
-   Verify Ollama service is running
-   ollama list
-   ```
+# Start Qdrant
+docker run -p 6333:6333 qdrant/qdrant
+```
 
-3. **Model Loading Issues**
-   ```
-   Check if the Llama2 model is downloaded
-   ollama pull llama2
-   ```
+**Ollama Not Responding:**
+```bash
+# Check Ollama status
+ollama list
 
-4. **Port Conflicts**
-   ```
-   Make sure ports 6333, 8000, and 11434 are available
-   ```
+# Pull model again
+ollama pull llama2
 
-### Performance Optimization
+# Restart Ollama
+killall ollama
+ollama serve
+```
 
-- For production use, consider using GPU acceleration for the embedding model
-- Implement caching for frequently searched queries
-- Use a production-grade deployment for Qdrant and Ollama
+**Port Conflicts:**
+```bash
+# Check what's using ports
+lsof -i :6333  # Qdrant
+lsof -i :8000  # FastAPI
+lsof -i :8501  # Streamlit
+```
 
-## API Documentation
+**Model Loading Errors:**
+```bash
+# Reinstall sentence-transformers
+pip uninstall sentence-transformers
+pip install sentence-transformers
+```
 
-Once the FastAPI server is running, visit `http://localhost:8000/docs` for interactive API documentation.
+### Performance Tips
 
-## Contributing
+- Use GPU acceleration for embeddings (CUDA)
+- Limit document batch size for large datasets
+- Implement caching for frequent queries
+- Consider Qdrant on-disk storage for large collections
+
+## 🚀 Deployment
+
+### Production Considerations
+
+1. **Security**: Disable debug mode in production
+2. **Scaling**: Use Qdrant in cluster mode for large datasets
+3. **Monitoring**: Add logging and metrics
+4. **Backup**: Regular Qdrant snapshots
+
+### Docker Compose (Future)
+
+```yaml
+# Coming soon: docker-compose.yml
+services:
+  qdrant:
+    image: qdrant/qdrant
+  ollama:
+    image: ollama/ollama
+  api:
+    build: .
+```
+
+## 📈 Roadmap
+
+- [ ] Desktop app (Tauri/Electron)
+- [ ] Plugin system architecture
+- [ ] Obsidian connector plugin
+- [ ] Plugin marketplace
+- [ ] User authentication
+- [ ] Multi-document RAG
+- [ ] Web search integration
+- [ ] Voice input/output
+
+## 🤝 Contributing
 
 1. Fork the repository
 2. Create a feature branch
-3. Make your changes
-4. Add tests if applicable
-5. Submit a pull request
+3. Make changes
+4. Add tests
+5. Submit PR
 
-## License
+## 📄 License
 
-[Add your license information here]
+[Add your license here]
 
-## Acknowledgments
+## 🙏 Acknowledgments
 
-- **Qdrant** for the vector database
-- **SentenceTransformers** for the embedding models
-- **Ollama** for local LLM serving
-- **FastAPI** for the web framework
-- **Streamlit** for the frontend framework
+- [Qdrant](https://qdrant.tech/) - Vector database
+- [SentenceTransformers](https://www.sentence-transformers.org/) - Embeddings
+- [Ollama](https://ollama.com/) - Local LLM serving
+- [FastAPI](https://fastapi.tiangolo.com/) - Web framework
+- [Streamlit](https://streamlit.io/) - Frontend framework
+
+## 📞 Support
+
+- Open an issue for bugs
+- Start a discussion for questions
+- Submit PRs for improvements
 
 ---
 
-For questions or support, please open an issue in the repository.
+**Built with ❤️ for privacy-conscious AI enthusiasts**
